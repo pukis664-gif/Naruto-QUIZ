@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Naruto Quiz Ultimate</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    color: white;
+    text-align: center;
+    background: url('https://i.imgur.com/6Iej2c3.jpg') no-repeat center center fixed;
+    background-size: cover;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: -1;
+}
+
+h1 {
+    color: orange;
+    text-shadow: 0 0 10px orange;
+}
+
+button {
+    display: block;
+    width: 80%;
+    margin: 10px auto;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    background: orange;
+    font-weight: bold;
+}
+
+button:hover {
+    background: red;
+    color: white;
+}
+
+#game, #endScreen {
+    display: none;
+}
+
+.trophy {
+    font-size: 80px;
+    animation: glow 1s infinite alternate;
+}
+
+@keyframes glow {
+    from { text-shadow: 0 0 10px gold; }
+    to { text-shadow: 0 0 30px yellow; }
+}
+
+.footer {
+    position: fixed;
+    bottom: 8px;
+    width: 100%;
+    font-size: 15px;
+    color: #ccc;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🔥 Naruto Quiz 🔥</h1>
+
+<div id="menu">
+    <h2>Pilih Mode</h2>
+    <button onclick="startGame('easy')">Easy 😄</button>
+    <button onclick="startGame('hard')">Hard 😈</button>
+</div>
+
+<div id="game">
+    <h3 id="number"></h3>
+    <h3 id="question"></h3>
+    <div id="hint"></div>
+    <div id="choices"></div>
+    <div id="result"></div>
+    <div id="score">Score: 0</div>
+</div>
+
+<div id="endScreen">
+    <div class="trophy">🏆</div>
+    <h2>SELAMAT KALIAN BISA MENYELESAIKAN SOAL ALTAF HEHEHEHE</h2>
+    <h3 id="finalScore"></h3>
+    <p id="answers"></p>
+    <button onclick="showMenu()">Main Lagi</button>
+</div>
+
+<div class="footer">by: Altaf Kusuma</div>
+
+<script>
+let mode, questions, current, score, wrongAnswers;
+
+/* EASY 15 SOAL */
+const easyQuestions = [
+{q:"Siapa Naruto?",c:["Hokage","Musuh","Guru","Samurai"],a:0,h:"Dia jadi Hokage"},
+{q:"Jurus Naruto?",c:["Rasengan","Chidori","Api","Petir"],a:0,h:"Bola biru"},
+{q:"Teman Naruto?",c:["Sasuke","Madara","Pain","Obito"],a:0,h:"Rival"},
+{q:"Desa Naruto?",c:["Konoha","Suna","Iwa","Kiri"],a:0,h:"Daun"},
+{q:"Guru Naruto?",c:["Jiraiya","Obito","Madara","Gaara"],a:0,h:"Sannin"},
+{q:"Siapa Sakura?",c:["Tim 7","Musuh","Guru","Kage"],a:0,h:"Satu tim"},
+{q:"Siapa Kakashi?",c:["Guru","Musuh","Hokage 1","Anbu"],a:0,h:"Guru Naruto"},
+{q:"Naruto punya apa?",c:["Kurama","Kucing","Naga","Serigala"],a:0,h:"Bijuu"},
+{q:"Siapa Gaara?",c:["Kazekage","Hokage","Raikage","Mizukage"],a:0,h:"Pasir"},
+{q:"Siapa Hinata?",c:["Istri Naruto","Musuh","Guru","Anbu"],a:0,h:"Byakugan"},
+{q:"Senjata ninja?",c:["Kunai","Pistol","Laser","Bom"],a:0,h:"Ninja"},
+{q:"Naruto suka?",c:["Ramen","Nasi","Roti","Daging"],a:0,h:"Favorit"},
+{q:"Siapa Iruka?",c:["Guru","Musuh","Kage","Anbu"],a:0,h:"Awal"},
+{q:"Siapa Tsunade?",c:["Hokage","Musuh","Anbu","Chunin"],a:0,h:"Perempuan kuat"},
+{q:"Siapa Rock Lee?",c:["Taijutsu","Genjutsu","Ninjutsu","Sensor"],a:0,h:"Tidak bisa ninjutsu"}
+];
+
+/* HARD 16 SOAL (ADA SOAL ALTAF 😎) */
+const hardQuestions = [
+{q:"Ayah Naruto?",c:["Minato","Hashirama","Tobirama","Hiruzen"],a:0},
+{q:"Ibu Naruto?",c:["Kushina","Tsunade","Hinata","Sakura"],a:0},
+{q:"Mangekyou Sharingan milik?",c:["Sasuke","Naruto","Lee","Gaara"],a:0},
+{q:"Nama rubah Naruto?",c:["Kurama","Isobu","Matatabi","Son Goku"],a:0},
+{q:"Hokage 1?",c:["Hashirama","Minato","Naruto","Tobirama"],a:0},
+{q:"Hokage 2?",c:["Tobirama","Hashirama","Hiruzen","Minato"],a:0},
+{q:"Hokage 3?",c:["Hiruzen","Minato","Naruto","Kakashi"],a:0},
+{q:"Organisasi jahat?",c:["Akatsuki","Anbu","Kage","Samurai"],a:0},
+{q:"Pemimpin Akatsuki?",c:["Pain","Naruto","Itachi","Obito"],a:0},
+{q:"Identitas Tobi?",c:["Obito","Madara","Itachi","Nagato"],a:0},
+{q:"Guru Minato?",c:["Jiraiya","Orochimaru","Tsunade","Kakashi"],a:0},
+{q:"Bijuu ekor 1?",c:["Shukaku","Kurama","Isobu","Gyuki"],a:0},
+{q:"Bijuu ekor 8?",c:["Gyuki","Kurama","Matatabi","Son Goku"],a:0},
+{q:"Teknik Sasuke?",c:["Chidori","Rasengan","Byakugan","Rinnegan"],a:0},
+{q:"Mode Naruto kuat?",c:["Sage Mode","Normal","Chunin","Genin"],a:0},
+
+/* SOAL ALTAF 🔥 */
+{q:"Altaf mempunyai skil?",c:["Pepeng","Tekan","Domain expalsion","Semua benar"],a:3}
+];
+
+function showMenu(){
+    document.getElementById("menu").style.display="block";
+    document.getElementById("game").style.display="none";
+    document.getElementById("endScreen").style.display="none";
+}
+
+function startGame(m){
+    mode=m;
+    questions = mode==="easy"?easyQuestions:hardQuestions;
+    current=0;
+    score=0;
+    wrongAnswers=[];
+
+    document.getElementById("menu").style.display="none";
+    document.getElementById("endScreen").style.display="none";
+    document.getElementById("game").style.display="block";
+
+    loadQuestion();
+}
+
+function loadQuestion(){
+    let q=questions[current];
+
+    document.getElementById("number").innerText=
+    "Soal "+(current+1)+" / "+questions.length;
+
+    document.getElementById("question").innerText=q.q;
+
+    document.getElementById("hint").innerText=
+    mode==="easy"?"💡 "+q.h:"";
+
+    let choicesDiv=document.getElementById("choices");
+    choicesDiv.innerHTML="";
+
+    q.c.forEach((choice,i)=>{
+        let btn=document.createElement("button");
+        btn.innerText=choice;
+        btn.onclick=()=>answer(i);
+        choicesDiv.appendChild(btn);
+    });
+
+    document.getElementById("result").innerText="";
+}
+
+function answer(i){
+    let q=questions[current];
+
+    if(i===q.a){
+        score++;
+        document.getElementById("result").innerText="✅ Benar!";
+    }else{
+        document.getElementById("result").innerText="❌ Salah!";
+        wrongAnswers.push(q.q+" → "+q.c[q.a]);
+    }
+
+    document.getElementById("score").innerText="Score: "+score;
+
+    current++;
+
+    if(current<questions.length){
+        setTimeout(loadQuestion,800);
+    }else{
+        endGame();
+    }
+}
+
+function endGame(){
+    document.getElementById("game").style.display="none";
+    document.getElementById("endScreen").style.display="block";
+
+    document.getElementById("finalScore").innerText=
+    "Skor: "+score+"/"+questions.length;
+
+    document.getElementById("answers").innerHTML=
+    wrongAnswers.length>0?
+    "<b>Jawaban benar:</b><br>"+wrongAnswers.join("<br>")
+    :"SEMUA BENAR 🔥";
+}
+
+showMenu();
+</script>
+
+</body>
+</html>

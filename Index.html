@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Naruto Game Menu</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    text-align: center;
+    color: white;
+
+    background: url('https://i.imgur.com/6Iej2c3.jpg') no-repeat center center fixed;
+    background-size: cover;
+}
+
+/* overlay */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: -1;
+}
+
+h1 {
+    margin-top: 80px;
+    font-size: 30px;
+    color: orange;
+    text-shadow: 0 0 10px orange;
+}
+
+.menu {
+    margin-top: 50px;
+}
+
+button {
+    display: block;
+    width: 250px;
+    margin: 20px auto;
+    padding: 15px;
+    border-radius: 15px;
+    border: none;
+    font-size: 18px;
+    font-weight: bold;
+    background: orange;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: red;
+    color: white;
+}
+
+/* animasi */
+button:active {
+    transform: scale(0.95);
+}
+
+.footer {
+    position: fixed;
+    bottom: 10px;
+    width: 100%;
+    font-size: 15px;
+    color: #ccc;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🔥 Naruto Game 🔥</h1>
+
+<div class="menu">
+    <button onclick="playGame()">🎮 Main Naruto Quiz</button>
+    <button onclick="alert('Coming Soon 😎')">⚔️ Mode Battle (Soon)</button>
+</div>
+
+<div class="footer">by: Altaf Kusuma</div>
+
+<script>
+function playGame(){
+    window.location.href = "naruto-full.html";
+}
+</script>
+
+</body>
+</html>
